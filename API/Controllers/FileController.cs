@@ -58,7 +58,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return BadRequest("No files given!");
                 }
             }
             catch (Exception ex)
