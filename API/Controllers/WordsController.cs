@@ -20,7 +20,7 @@ namespace API.Controllers
         public async Task<ActionResult<List<Word>>> GetWords()
         {
             var allWords = await _context.Words.ToListAsync();
-            if(allWords.Count == 0)
+            if (allWords.Count == 0)
             {
                 return NotFound("No words found!");
             }
@@ -34,11 +34,11 @@ namespace API.Controllers
         public async Task<ActionResult<Word>> GetWord(Guid id)
         {
             var word = await _context.Words.FindAsync(id);
-            if(word == null)
+            if (word == null)
             {
-                return NotFound("No word found with the given ID");
+                return NotFound("No word found with the given ID!");
             }
-            else 
+            else
             {
                 return word;
             }
@@ -56,9 +56,16 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteWord(Guid id)
         {
             var wordToDelete = await _context.Words.FindAsync(id);
-            _context.Remove(wordToDelete);
-            await _context.SaveChangesAsync();
-            return Ok("Word deleted successfully!");
+            if (wordToDelete == null)
+            {
+                return NotFound("Unable to delete word. No word found with the given ID!");
+            }
+            else
+            {
+                _context.Remove(wordToDelete);
+                await _context.SaveChangesAsync();
+                return Ok("Word deleted successfully!");
+            }
         }
     }
 }

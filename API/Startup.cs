@@ -36,7 +36,7 @@ namespace API
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProfanityCheck API", Version = "v1", Description = "Swagger API for ProfanityCheck" });
             });
 
             services.AddDbContext<DataContext>(opt =>
