@@ -20,40 +20,28 @@ namespace API.Tests
         {
             _controller = new WordsController(_context);
         }
+        
         [Fact]
-        public void AddWord_ReturnsWord()
+        public async void AddWord_ReturnsWord()
         {
-            Word testWord = new Word
-            {
+            var controller = new WordsController(_context);
+            var word = new Word {
                 Id = new Guid(),
                 Text = "TestWord"
             };
-            var result = _controller.AddWord(testWord);
-            Assert.NotNull(result);
+
+            var result = await controller.AddWord(word);
+            var okResult = result as OkObjectResult;
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
         }
 
         [Fact]
-        public void GetWords_ReturnsWords()
+        public async void GetWords_ReturnsWords()
         {
-            var result = _controller.GetWords();
-            Assert.NotNull(result);
+            var result = await _controller.GetWords();
             var okResult = new OkObjectResult(result);
             Assert.Equal(200, okResult.StatusCode);
-        }
-        [Fact]
-        public async Task GetWord_ReturnsWord()
-        {
-            Word word = new Word()
-            {
-                Id = new Guid(),
-                Text = "TestWord"
-            };
-            var mockContext = new Mock<DataContext>();
-            mockContext.Setup(w => w.Words.FindAsync(word.Id)).ReturnsAsync(word);
-            WordsController controller = new WordsController(mockContext.Object);
-            var result = await controller.GetWord(word.Id);
-            var receivedWord = result.Value as Word;
-            Assert.Equal(receivedWord.Text, word.Text);
         }
     }
 }
