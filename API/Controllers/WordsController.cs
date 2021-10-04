@@ -26,7 +26,7 @@ namespace API.Controllers
             }
             else
             {
-                return Ok(allWords);
+                return allWords;
             }
         }
 

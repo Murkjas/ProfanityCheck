@@ -2,46 +2,66 @@ using System;
 using System.Threading.Tasks;
 using API.Controllers;
 using Domain;
+using Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using Persistence;
 using Xunit;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace API.Tests
 {
-    public class WordsControllerTest
+    public abstract class WordsControllerTest
     {
-        private readonly DataContext _context;
-        private readonly WordsController _controller;
-
-        public WordsControllerTest()
+        protected WordsControllerTest(DbContextOptions<DataContext> contextOptions)
         {
-            _controller = new WordsController(_context);
-        }
-        
-        [Fact]
-        public async void AddWord_ReturnsWord()
-        {
-            var controller = new WordsController(_context);
-            var word = new Word {
-                Id = new Guid(),
-                Text = "TestWord"
-            };
+            ContextOptions = contextOptions;
 
-            var result = await controller.AddWord(word);
-            var okResult = result as OkObjectResult;
-            Assert.NotNull(okResult);
-            Assert.Equal(200, okResult.StatusCode);
+            Seed();
         }
 
-        [Fact]
-        public async void GetWords_ReturnsWords()
+        protected DbContextOptions<DataContext> ContextOptions { get; }
+
+        private void Seed()
         {
-            var result = await _controller.GetWords();
-            var okResult = new OkObjectResult(result);
-            Assert.Equal(200, okResult.StatusCode);
+            using (var context = new DataContext(ContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                var words = new List<Word>
+                {
+                    new Word
+                    {
+                        Text = "Test1"
+                    },
+                    new Word
+                    {
+                        Text = "Test2"
+                    },
+                    new Word
+                    {
+                        Text = "Test3"
+                    }
+                };
+
+                context.Words.AddRange(words);
+
+                context.SaveChanges();
+            }
+        }
+
+        [Fact]
+        public async Task Can_get_words()
+        {
+            using (var context = new DataContext(ContextOptions))
+            {
+                var controller = new WordsController(context);
+
+                var items = await controller.GetWords();
+                Assert.Equal(3, items.Value.Count);
+            }
         }
     }
 }
