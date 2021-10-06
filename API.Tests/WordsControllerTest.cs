@@ -51,7 +51,7 @@ namespace API.Tests
                 context.SaveChanges();
             }
         }
-
+// Add comment for Azure deployment
         [Fact]
         public async Task Can_get_words()
         {
